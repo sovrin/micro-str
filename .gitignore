@@ -1,0 +1,7 @@
+/.idea
+/node_modules
+
+!/**/.gitkeep
+stores
+
+package-lock.json
