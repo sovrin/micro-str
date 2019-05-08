@@ -3,4 +3,4 @@
  * Date: 20.02.2019
  * Time: 22:19
  */
-module.exports = require('./src/index');
+module.exports = require('./lib/index');
