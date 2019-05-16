@@ -10,7 +10,6 @@ describe('micro-str', () => {
 
     const store = storeFactory(PATH);
     const key = 'foo';
-    const value = 'bar';
 
     it('should be empty', () => {
         const entities = store.fetch(key);
@@ -20,10 +19,17 @@ describe('micro-str', () => {
     });
 
     it('should create return entity', () => {
-        const entity = store.create(key, value);
+        const entity = store.create(key, 'test');
 
         assert.isObject(entity);
-        assert.equal(entity.value(), value);
+        assert.equal(entity.value(), 'test');
+    });
+
+    it('should get the desired entity', () => {
+        const entity = store.get(2);
+
+        assert.isObject(entity);
+        assert.equal(entity.value(), 'test');
     });
 
     it('should return one entity', async () => {
@@ -44,8 +50,8 @@ describe('micro-str', () => {
     });
 
     it('should save entities to file', async () => {
-        store.create(key, value);
-        store.create(key, value);
+        store.create(key, 'foo');
+        store.create(key, 'bar');
         store.commit();
 
         const entities = store.fetch(key);
@@ -54,20 +60,19 @@ describe('micro-str', () => {
         assert.isNotEmpty(entities);
         assert.isTrue(entities.length === 2);
 
-        for (const entity of entities) {
-            assert.isTrue(entity.value() === value);
-        }
+        assert.isTrue(entities[0].value() === 'foo');
+        assert.isTrue(entities[1].value() === 'bar');
     });
 
     it('should not load from file', async () => {
-        const entity = store.create(key, value);
+        const entity = store.create(key, 'value');
         const loadedFromFile = entity.load();
 
         assert.isFalse(loadedFromFile);
     });
 
     it('should load from file', async () => {
-        const entity = store.create(key, value);
+        const entity = store.create(key, 'value');
         store.commit();
 
         const loadedFromFile = entity.load();
@@ -76,7 +81,7 @@ describe('micro-str', () => {
     });
 
     it('should save new value', async () => {
-        const entity = store.create(key, value);
+        const entity = store.create(key, 'value');
         entity.value('newvalue');
 
         assert.equal(entity.value(), 'newvalue');
@@ -84,21 +89,21 @@ describe('micro-str', () => {
     });
 
     it('should not be able to remove uncommited entity', async () => {
-        const entity = store.create(key, value);
+        const entity = store.create(key, 'foo');
         const removed = entity.remove();
 
         assert.isFalse(removed);
     });
 
     it('should remove commited entity', async () => {
-        const entity = store.create(key, value);
+        const entity = store.create(key, 'foo');
         store.commit();
 
         const removed = entity.remove();
 
         assert.isTrue(removed);
 
-        const fetched = store.get(entity.id(), entity.key());
+        const fetched = store.get(entity.id());
         assert.isNull(fetched);
     });
 });
