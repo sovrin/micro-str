@@ -26,7 +26,7 @@ describe('micro-str', () => {
     });
 
     it('should get the desired entity', () => {
-        const entity = store.get(2);
+        const entity = store.get(2, key);
 
         assert.isObject(entity);
         assert.equal(entity.value(), 'test');
@@ -105,6 +105,15 @@ describe('micro-str', () => {
 
         const fetched = store.get(entity.id());
         assert.isNull(fetched);
+    });
+
+    it('should get entity', async () => {
+        const entity = store.create(key, 'footest');
+        store.commit();
+
+        const stored = store.get(entity.id(), entity.key());
+
+        assert.equal(entity.value(), stored.value());
     });
 });
 
