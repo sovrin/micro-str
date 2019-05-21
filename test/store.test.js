@@ -1,6 +1,6 @@
 const {assert} = require('chai');
 
-const storeFactory = require('../index');
+const storeFactory = require('../lib/index').default;
 const PATH = __dirname + '/../test/store';
 const {clean, prepare} = require('./utils');
 

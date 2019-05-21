@@ -1,52 +1,96 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = require("path");
-const entity_1 = require("./entity");
-const store_1 = require("./store");
-const key_1 = require("./key");
-const stack_1 = require("./stack");
-exports.default = (path) => {
-    const resolver = (...parts) => path_1.resolve(path, ...parts);
-    const stack = stack_1.default();
-    const store = store_1.default(resolver);
-    const keys = key_1.default(resolver);
-    const createEntity = entity_1.default(keys, resolver);
-    const get = (id, alias) => {
+import {resolve} from "path";
+import entityFactory from "./entity";
+import storeFactory from "./store";
+import keyFactory from "./key";
+import stackFactory from "./stack";
+
+/**
+ * User: Oleg Kamlowski <n@sovrin.de>
+ * Date: 05.04.2019
+ * Time: 13:55
+ *
+ * @param path
+ */
+export default (path: string) => {
+    const resolver = (...parts: Array<string>) => resolve(path, ...parts);
+
+    const stack = stackFactory();
+    const store = storeFactory(resolver);
+    const keys = keyFactory(resolver);
+    const createEntity = entityFactory(keys, resolver);
+
+    /**
+     *
+     * @param id
+     * @param alias
+     */
+    const get = (id: number, alias: string) => {
         const key = store.alias(alias);
+
         if (stack.get(id, key)) {
             return stack.get(id, key);
         }
+
         const ref = keys.get(key, id);
+
         if (!ref) {
             return null;
         }
+
         const entity = createEntity(id, key);
         entity.load();
+
         return entity;
     };
-    const create = (alias, value) => {
+
+    /**
+     *
+     * @param alias
+     * @param value
+     */
+    const create = (alias: string, value: string) => {
         const [_id, _alias] = store.create(alias);
         const entity = createEntity(_id, _alias, value);
+
         stack.set(entity, () => {
             store.save();
             entity.save();
         });
+
         return entity;
     };
+
+    /**
+     *
+     */
     const commit = () => stack.commit();
+
+    /**
+     *
+     */
     const flush = () => stack.flush();
+
+    /**
+     *
+     * @param alias
+     */
     const fetch = (alias) => {
         const key = store.alias(alias);
+
         if (key && stack.ids(key)) {
             return stack.ids(key).map(id => stack.get(id, key));
         }
+
         const ids = keys.ids(key);
+
         return ids.map((id) => {
             const entity = createEntity(id, key);
             entity.load();
+
             return entity;
         });
     };
+
     return {
         get,
         fetch,

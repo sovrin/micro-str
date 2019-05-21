@@ -1,9 +1,17 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const utils_1 = require("./utils");
-const enums_1 = require("./enums");
-exports.default = (keys, resolver) => (id = null, key = null, value = null) => {
-    const path = resolver(enums_1.Folder.VALUES, id + enums_1.Extension.VALUES);
+import {read, write} from "./utils";
+import {Extension, Folder} from "./enums";
+
+/**
+ * User: Oleg Kamlowski <n@sovrin.de>
+ * Date: 01.05.2019
+ * Time: 15:41
+ *
+ * @param keys
+ * @param resolver
+ */
+export default (keys, resolver) => (id = null, key = null, value = null) => {
+    const path = resolver(Folder.VALUES, id + Extension.VALUES);
+
     const entity = {
         id,
         key,
@@ -11,6 +19,7 @@ exports.default = (keys, resolver) => (id = null, key = null, value = null) => {
         dirty: false,
         permanent: value === null,
     };
+
     const Method = {
         id: () => entity.id,
         key: () => entity.key,
@@ -19,35 +28,55 @@ exports.default = (keys, resolver) => (id = null, key = null, value = null) => {
                 entity.value = value;
                 entity.dirty = true;
             }
+
             return entity.value;
         },
         dirty: (value = null) => {
             if (value !== null) {
                 entity.dirty = value;
             }
+
             return entity.dirty;
         },
         permanent: () => entity.permanent,
     };
+
+    /**
+     *
+     */
     const save = () => {
-        utils_1.write(path, Method.value());
+        write(path, Method.value());
+
         if (!instance.permanent()) {
             entity.permanent = true;
             keys.save(instance);
         }
+
         if (!instance.dirty()) {
             return false;
         }
+
         return keys.update(instance);
     };
+
+    /**
+     *
+     */
     const load = () => {
         if (!instance.permanent()) {
             return false;
         }
-        entity.value = utils_1.read(path);
+
+        entity.value = read(path);
+
         return true;
     };
+
+    /**
+     *
+     */
     const remove = () => keys.remove(instance);
+
     const instance = {
         load,
         save,
@@ -58,5 +87,6 @@ exports.default = (keys, resolver) => (id = null, key = null, value = null) => {
         dirty: Method.dirty,
         permanent: Method.permanent,
     };
+
     return instance;
 };
