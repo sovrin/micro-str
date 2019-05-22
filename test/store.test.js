@@ -1,7 +1,7 @@
 const {assert} = require('chai');
 
 const storeFactory = require('../lib/index').default;
-const PATH = __dirname + '/../test/store';
+const PATH = __dirname + '/../test/store_strict';
 const {clean, prepare} = require('./utils');
 
 describe('micro-str', () => {

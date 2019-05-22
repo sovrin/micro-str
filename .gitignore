@@ -4,4 +4,5 @@
 !/**/.gitkeep
 stores
 test/store
+test/store_strict
 package-lock.json
