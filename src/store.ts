@@ -61,13 +61,16 @@ export default (resolver: Function) => {
     /**
      *
      * @param key
+     * @param strict
      */
-    const create = (key: string) => {
+    const create = (key: string, strict: boolean) => {
         let alias = resolve(key);
 
         if (!alias) {
             alias = next();
             keys[key] = alias;
+        } else if (strict) {
+            return null;
         }
 
         const id = next();

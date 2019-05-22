@@ -10,8 +10,9 @@ import stackFactory from "./stack";
  * Time: 13:55
  *
  * @param path
+ * @param strict
  */
-export default (path: string) => {
+export default (path: string, strict: boolean = false) => {
     const resolver = (...parts: Array<string>) => resolve(path, ...parts);
 
     const stack = stackFactory();
@@ -49,8 +50,13 @@ export default (path: string) => {
      * @param value
      */
     const create = (alias: string, value: string) => {
-        const [_id, _alias] = store.create(alias);
-        const entity = createEntity(_id, _alias, value);
+        const pointers = store.create(alias, strict);
+
+        if (!pointers) {
+            return null;
+        }
+
+        const entity = createEntity(...pointers, value);
 
         stack.set(entity, () => {
             store.save();

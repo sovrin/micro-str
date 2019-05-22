@@ -1,4 +1,4 @@
-declare const _default: (path: string) => {
+declare const _default: (path: string, strict?: boolean) => {
     get: (id: number, alias: string) => any;
     fetch: (alias: any) => any;
     create: (alias: string, value: string) => {
