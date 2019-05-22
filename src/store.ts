@@ -83,7 +83,7 @@ export default (resolver: Function) => {
 
     return {
         create,
-        alias: resolve,
+        resolve,
         save,
     };
 };

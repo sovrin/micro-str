@@ -26,7 +26,7 @@ export default (path: string, strict: boolean = false) => {
      * @param alias
      */
     const get = (id: number, alias: string) => {
-        const key = store.alias(alias);
+        const key = store.resolve(alias);
 
         if (stack.get(id, key)) {
             return stack.get(id, key);
@@ -81,7 +81,7 @@ export default (path: string, strict: boolean = false) => {
      * @param alias
      */
     const fetch = (alias) => {
-        const key = store.alias(alias);
+        const key = store.resolve(alias);
 
         if (key && stack.ids(key)) {
             return stack.ids(key).map(id => stack.get(id, key));
